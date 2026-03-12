@@ -1,0 +1,74 @@
+{
+    "evaluationCountEventDWHPersister": {
+        "flushSize": 1,
+        "flushInterval": 1,
+        "flushTimeout": 30,
+        "dataWarehouse": {
+            "type": "mysql",
+            "batchSize": 1000,
+            "timezone": "UTC",
+            "mysql": {
+                "useMainConnection": true,
+                "host": "mysql",
+                "port": 3306,
+                "user": "bucketeer",
+                "password": "bucketeer",
+                "database": "bucketeer"
+            },
+            "postgres": {
+                "host": "postgres",
+                "port": 5432,
+                "user": "bucketeer",
+                "password": "bucketeer",
+                "database": "bucketeer"
+            },
+            "bigquery": {
+                "project": "",
+                "dataset": "",
+                "location": "US"
+            }
+        }
+    },
+    "evaluationCountEventOPSPersister": {
+        "flushSize": 1,
+        "flushInterval": 1,
+        "flushTimeout": 30
+    },
+    "goalCountEventDWHPersister": {
+        "flushSize": 1,
+        "flushInterval": 1,
+        "flushTimeout": 30,
+        "maxRetryGoalEventPeriod": 43200,
+        "retryGoalEventInterval": 1,
+        "dataWarehouse": {
+            "type": "mysql",
+            "batchSize": 1000,
+            "timezone": "UTC",
+            "mysql": {
+                "useMainConnection": true,
+                "host": "mysql",
+                "port": 3306,
+                "user": "bucketeer",
+                "password": "bucketeer",
+                "database": "bucketeer"
+            },
+            "postgres": {
+                "host": "postgres",
+                "port": 5432,
+                "user": "bucketeer",
+                "password": "bucketeer",
+                "database": "bucketeer"
+            },
+            "bigquery": {
+                "project": "",
+                "dataset": "",
+                "location": "US"
+            }
+        }
+    },
+    "goalCountEventOPSPersister": {
+        "flushSize": 1,
+        "flushInterval": 1,
+        "flushTimeout": 30
+    }
+}

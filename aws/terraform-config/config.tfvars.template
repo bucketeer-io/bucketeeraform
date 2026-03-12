@@ -1,0 +1,14 @@
+# Copy to config.tfvars and fill in (do not commit config.tfvars).
+
+aws_region            = "us-east-1"
+aws_access_key_id     = "YOUR_AWS_ACCESS_KEY"
+aws_secret_access_key = "YOUR_AWS_SECRET_KEY"
+app_name              = "bucketeer"
+db_password           = "REPLACE_WITH_MYSQL_PASSWORD"
+
+# Optional (defaults shown)
+# db_instance_class   = "db.t3.micro"
+# redis_node_type     = "cache.t3.micro"
+# ecs_cpu             = 256
+# ecs_memory          = 512
+# bucketeer_image_tag = "latest"

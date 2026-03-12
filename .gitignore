@@ -1,0 +1,54 @@
+# ─── Terraform ────────────────────────────────────────────────────────────────
+# Secrets — copy config.tfvars.template → config.tfvars and fill in values
+terraform-config/config.tfvars
+terraform.tfvars
+**/terraform.tfvars
+aws/terraform-config/config.tfvars
+
+# State, cache, and lock
+**/.terraform/
+**/.terraform.lock.hcl
+*.tfstate
+*.tfstate.backup
+*.tfplan
+crash.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# ─── Credentials & secrets ────────────────────────────────────────────────────
+*.env
+.env
+.env.*
+!.env.example
+!.env.template
+secrets/
+creds/
+credentials/
+
+# ─── IDE ──────────────────────────────────────────────────────────────────────
+.idea/
+*.iml
+.vscode/
+*.code-workspace
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+.vs/
+
+# ─── Claude / AI tools ────────────────────────────────────────────────────────
+.claude/
+.cursor/
+
+# ─── OS ───────────────────────────────────────────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
