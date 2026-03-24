@@ -1,0 +1,80 @@
+app            = "bucketeer-api"
+primary_region = "sin"
+
+[build]
+  image = "registry.fly.io/bucketeer-api:latest"
+
+[env]
+  BUCKETEER_API_PROJECT                    = "bucketeer-flyio"
+  BUCKETEER_API_STORAGE_TYPE               = "mysql"
+  BUCKETEER_API_MYSQL_USER                 = "bucketeer"
+  BUCKETEER_API_MYSQL_HOST                 = "bucketeer-mysql.internal"
+  BUCKETEER_API_MYSQL_PORT                 = "3306"
+  BUCKETEER_API_MYSQL_DB_NAME              = "bucketeer"
+  BUCKETEER_API_GOAL_TOPIC                 = "goal"
+  BUCKETEER_API_EVALUATION_TOPIC           = "evaluation"
+  BUCKETEER_API_USER_TOPIC                 = "user"
+  BUCKETEER_API_METRICS_TOPIC              = "metrics"
+  BUCKETEER_API_PUBLISH_NUM_GOROUTINES     = "200"
+  BUCKETEER_API_PUBLISH_TIMEOUT            = "1m"
+  BUCKETEER_API_REDIS_SERVER_NAME          = "api-gateway"
+  BUCKETEER_API_REDIS_POOL_MAX_IDLE        = "25"
+  BUCKETEER_API_REDIS_POOL_MAX_ACTIVE      = "25"
+  BUCKETEER_API_PUBSUB_TYPE                = "redis-stream"
+  BUCKETEER_API_PUBSUB_REDIS_SERVER_NAME   = "non-persistent-redis"
+  BUCKETEER_API_PUBSUB_REDIS_POOL_SIZE     = "25"
+  BUCKETEER_API_PUBSUB_REDIS_MIN_IDLE      = "25"
+  BUCKETEER_API_PUBSUB_REDIS_PARTITION_COUNT = "16"
+  BUCKETEER_API_OLDEST_EVENT_TIMESTAMP     = "24h"
+  BUCKETEER_API_FURTHEST_EVENT_TIMESTAMP   = "24h"
+  BUCKETEER_API_PORT                       = "9090"
+  BUCKETEER_API_GRPC_GATEWAY_PORT          = "9089"
+  BUCKETEER_API_METRICS_PORT               = "9002"
+  BUCKETEER_API_CERT                       = "/usr/local/certs/service/tls.crt"
+  BUCKETEER_API_KEY                        = "/usr/local/certs/service/tls.key"
+  BUCKETEER_API_SERVICE_TOKEN              = "/usr/local/service-token/token"
+  BUCKETEER_API_FEATURE_SERVICE            = "bucketeer-web.internal:9098"
+  BUCKETEER_API_ACCOUNT_SERVICE            = "bucketeer-web.internal:9091"
+  BUCKETEER_API_PUSH_SERVICE               = "bucketeer-web.internal:9101"
+  BUCKETEER_API_CODE_REF_SERVICE           = "bucketeer-web.internal:9105"
+  BUCKETEER_API_AUDIT_LOG_SERVICE          = "bucketeer-web.internal:9093"
+  BUCKETEER_API_TAG_SERVICE                = "bucketeer-web.internal:9104"
+  BUCKETEER_API_TEAM_SERVICE               = "bucketeer-web.internal:9107"
+  BUCKETEER_API_NOTIFICATION_SERVICE       = "bucketeer-web.internal:9100"
+  BUCKETEER_API_EXPERIMENT_SERVICE         = "bucketeer-web.internal:9097"
+  BUCKETEER_API_EVENT_COUNTER_SERVICE      = "bucketeer-web.internal:9096"
+  BUCKETEER_API_ENVIRONMENT_SERVICE        = "bucketeer-web.internal:9095"
+  BUCKETEER_API_LOG_LEVEL                  = "info"
+  BUCKETEER_API_PROFILE                    = "false"
+  BUCKETEER_API_GCP_TRACE_ENABLED          = "false"
+  BUCKETEER_API_TRACE_SAMPLING_PROBABILITY = "0.0"
+  # Redis addr/password, MYSQL_PASS, TLS certs set as secrets by deploy.sh
+
+# Public services — Fly anycast routes SDK clients to the nearest region.
+# TCP passthrough (no Fly TLS termination); the app handles its own TLS.
+# Port 443: gRPC gateway (REST/HTTP API for SDKs and curl).
+# Port 9090: raw gRPC for native gRPC SDK clients.
+[[services]]
+  internal_port        = 9089
+  protocol             = "tcp"
+  auto_stop_machines   = false
+  auto_start_machines  = true
+  min_machines_running = 1
+  [[services.ports]]
+    port     = 443
+    handlers = []
+
+[[services]]
+  internal_port        = 9090
+  protocol             = "tcp"
+  auto_stop_machines   = false
+  auto_start_machines  = true
+  min_machines_running = 1
+  [[services.ports]]
+    port     = 9090
+    handlers = []
+
+[vm]
+  cpu_kind = "shared"
+  cpus     = 1
+  memory   = "256mb"

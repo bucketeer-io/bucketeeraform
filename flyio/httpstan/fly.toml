@@ -1,0 +1,10 @@
+app            = "bucketeer-httpstan"
+primary_region = "sin"
+
+[build]
+  image = "ghcr.io/bucketeer-io/bucketeer-httpstan:0.0.1"
+
+[vm]
+  cpu_kind = "shared"
+  cpus     = 1
+  memory   = "256mb"

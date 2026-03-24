@@ -1,0 +1,21 @@
+app            = "bucketeer-mysql"
+primary_region = "sin"
+
+[build]
+  image = "registry.fly.io/bucketeer-mysql:latest"
+
+[env]
+  MYSQL_DATABASE = "bucketeer"
+  MYSQL_USER     = "bucketeer"
+  MYSQL_INITDB_SKIP_TZINFO = "1"
+  # MYSQL_ROOT_PASSWORD and MYSQL_PASSWORD set as secrets by deploy.sh
+
+[[mounts]]
+  source       = "mysql_data"
+  destination  = "/var/lib/mysql"
+  initial_size = "1gb"
+
+[vm]
+  cpu_kind = "shared"
+  cpus     = 1
+  memory   = "1024mb"

@@ -1,0 +1,14 @@
+app            = "bucketeer-batch-cron"
+primary_region = "sin"
+
+[build]
+  image = "registry.fly.io/bucketeer-batch-cron:latest"
+
+[env]
+  BATCH_SERVICE_ADDRESS = "https://bucketeer-nginx.internal:443"
+  # TLS_CERT and SERVICE_TOKEN set as secrets by deploy.sh
+
+[vm]
+  cpu_kind = "shared"
+  cpus     = 1
+  memory   = "256mb"

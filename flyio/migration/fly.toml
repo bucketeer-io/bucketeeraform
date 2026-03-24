@@ -1,0 +1,14 @@
+app    = "bucketeer-migration"
+primary_region = "sin"
+
+[build]
+  image = "ghcr.io/bucketeer-io/bucketeer-migration:v2.2.0"
+
+# Run once then exit — triggered by deploy.sh via: fly machine run ...
+# The actual image tag is set by BUCKETEER_VERSION in config.env at runtime.
+# Not a long-running service, no vm block needed beyond minimum
+
+[vm]
+  cpu_kind = "shared"
+  cpus     = 1
+  memory   = "512mb"

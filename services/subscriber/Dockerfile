@@ -1,6 +1,8 @@
+ARG BUCKETEER_VERSION=v2.2.0
+FROM ghcr.io/bucketeer-io/bucketeer-subscriber:${BUCKETEER_VERSION} AS upstream
 FROM debian:bookworm-slim
 RUN apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/lists/*
-COPY --from=ghcr.io/bucketeer-io/bucketeer-subscriber:v2.2.0 /usr/local/bin/subscriber /usr/local/bin/bucketeer-subscriber
+COPY --from=upstream /usr/local/bin/subscriber /usr/local/bin/bucketeer-subscriber
 # Bake certs (context = repo root)
 RUN mkdir -p /usr/local/certs/service /usr/local/service-token /usr/local/oauth-key
 COPY certs/tls.crt            /usr/local/certs/service/tls.crt

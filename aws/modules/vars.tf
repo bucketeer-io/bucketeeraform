@@ -81,16 +81,10 @@ variable "ecs_memory" {
   default     = 512
 }
 
-variable "bucketeer_image_tag" {
-  description = "Bucketeer Docker image tag"
+variable "bucketeer_version" {
+  description = "Bucketeer release version (used for app images and migration)"
   type        = string
-  default     = "latest"
-}
-
-variable "bucketeer_migration_tag" {
-  description = "Bucketeer migration image tag from GHCR"
-  type        = string
-  default     = "v2.2.0-53-g1173b25"
+  default     = "v2.2.0"
 }
 
 # Optional
