@@ -7,13 +7,13 @@ REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO_ROOT"
 
 REGION="${AWS_REGION:-us-east-1}"
+BUCKETEER_VERSION="${BUCKETEER_VERSION:-v2.2.0}"
 
-# Build using services/ Dockerfiles (same as Fly push-images.sh; context = repo root)
-echo "Building from services/ with config/ ..."
-docker build --platform linux/amd64 -f services/api/Dockerfile       -t bucketeer-api:latest       .
-docker build --platform linux/amd64 -f services/web/Dockerfile       -t bucketeer-web:latest       .
-docker build --platform linux/amd64 -f services/batch/Dockerfile     -t bucketeer-batch:latest     .
-docker build --platform linux/amd64 -f services/subscriber/Dockerfile -t bucketeer-subscriber:latest .
+echo "Building from services/ with config/ (BUCKETEER_VERSION=${BUCKETEER_VERSION})..."
+docker build --platform linux/amd64 --build-arg BUCKETEER_VERSION="${BUCKETEER_VERSION}" -f services/api/Dockerfile       -t bucketeer-api:latest       .
+docker build --platform linux/amd64 --build-arg BUCKETEER_VERSION="${BUCKETEER_VERSION}" -f services/web/Dockerfile       -t bucketeer-web:latest       .
+docker build --platform linux/amd64 --build-arg BUCKETEER_VERSION="${BUCKETEER_VERSION}" -f services/batch/Dockerfile     -t bucketeer-batch:latest     .
+docker build --platform linux/amd64 --build-arg BUCKETEER_VERSION="${BUCKETEER_VERSION}" -f services/subscriber/Dockerfile -t bucketeer-subscriber:latest .
 docker build --platform linux/amd64 -f services/nginx/Dockerfile     -t bucketeer-nginx:latest     .
 
 # Get ECR URLs from Terraform

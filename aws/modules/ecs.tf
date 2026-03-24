@@ -155,7 +155,7 @@ resource "aws_ecs_task_definition" "api" {
 
   container_definitions = jsonencode([{
     name      = "api"
-    image     = "${aws_ecr_repository.api.repository_url}:${var.bucketeer_image_tag}"
+    image     = "${aws_ecr_repository.api.repository_url}:${var.bucketeer_version}"
     essential = true
     portMappings = [
       { containerPort = 9090, protocol = "tcp" },
@@ -244,7 +244,7 @@ resource "aws_ecs_task_definition" "web" {
 
   container_definitions = jsonencode([{
     name      = "web"
-    image     = "${aws_ecr_repository.web.repository_url}:${var.bucketeer_image_tag}"
+    image     = "${aws_ecr_repository.web.repository_url}:${var.bucketeer_version}"
     essential = true
     portMappings = [
       { containerPort = 9089, protocol = "tcp" },
@@ -372,7 +372,7 @@ resource "aws_ecs_task_definition" "batch" {
 
   container_definitions = jsonencode([{
     name      = "batch"
-    image     = "${aws_ecr_repository.batch.repository_url}:${var.bucketeer_image_tag}"
+    image     = "${aws_ecr_repository.batch.repository_url}:${var.bucketeer_version}"
     essential = true
     portMappings = [
       { containerPort = 9000, protocol = "tcp" },
@@ -459,7 +459,7 @@ resource "aws_ecs_task_definition" "subscriber" {
 
   container_definitions = jsonencode([{
     name      = "subscriber"
-    image     = "${aws_ecr_repository.subscriber.repository_url}:${var.bucketeer_image_tag}"
+    image     = "${aws_ecr_repository.subscriber.repository_url}:${var.bucketeer_version}"
     essential = true
     portMappings = [
       { containerPort = 9000, protocol = "tcp" },
@@ -539,7 +539,7 @@ resource "aws_ecs_task_definition" "nginx" {
 
   container_definitions = jsonencode([{
     name      = "nginx"
-    image     = "${aws_ecr_repository.nginx.repository_url}:${var.bucketeer_image_tag}"
+    image     = "${aws_ecr_repository.nginx.repository_url}:${var.bucketeer_version}"
     essential = true
     portMappings = [
       { containerPort = 80, protocol = "tcp" },
@@ -617,7 +617,7 @@ resource "aws_ecs_task_definition" "migration" {
 
   container_definitions = jsonencode([{
     name      = "migration"
-    image     = "ghcr.io/bucketeer-io/bucketeer-migration:${var.bucketeer_migration_tag}"
+    image     = "ghcr.io/bucketeer-io/bucketeer-migration:${var.bucketeer_version}"
     essential = true
     command = [
       "migrate", "apply",

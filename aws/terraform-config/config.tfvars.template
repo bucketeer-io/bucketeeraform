@@ -11,4 +11,4 @@ db_password           = "REPLACE_WITH_MYSQL_PASSWORD"
 # redis_node_type     = "cache.t3.micro"
 # ecs_cpu             = 256
 # ecs_memory          = 512
-# bucketeer_image_tag = "latest"
+# bucketeer_version   = "v2.2.0"

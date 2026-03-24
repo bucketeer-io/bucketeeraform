@@ -1,5 +1,55 @@
 APP_PREFIX   ?= bucketeer
 
+export FLYCTL_NO_UPDATE_CHECK := 1
+export FLY_NO_UPDATE_CHECK := 1
+
+# ── Fly.io (fly.toml based) ───────────────────────────────────────────────────
+
+create-redis-flyio:
+	@. flyio/config.env && \
+	REDIS_DB="$${APP_PREFIX}-redis" && \
+	if fly redis list 2>/dev/null | grep -q "$$REDIS_DB"; then \
+		echo "Upstash Redis '$$REDIS_DB' already exists"; \
+		fly redis status "$$REDIS_DB"; \
+	else \
+		echo "Creating Upstash Redis '$$REDIS_DB'..." && \
+		fly redis create --name "$$REDIS_DB" --region "$${REGION}" --no-replicas --disable-eviction --enable-prodpack=false --plan "Pay-as-you-go" -o personal; \
+	fi
+
+gen-certs-flyio:
+	@echo "Generating TLS cert with Fly.io .internal SANs..."
+	@openssl req -x509 -nodes -newkey rsa:2048 \
+		-keyout certs/tls.key -out certs/tls.crt \
+		-days 36500 -subj "/CN=*.bucketeer.io" \
+		-addext "subjectAltName=DNS:localhost,DNS:*.bucketeer.io,DNS:*.default.svc.cluster.local,DNS:*.bucketeer.local,DNS:nginx,DNS:web,DNS:api,DNS:batch,DNS:subscriber,DNS:mysql,DNS:redis,DNS:bucketeer-web.internal,DNS:bucketeer-nginx.internal,DNS:bucketeer-api.internal,DNS:bucketeer-batch.internal,DNS:bucketeer-subscriber.internal,DNS:bucketeer-mysql.internal"
+	@echo "Done. SANs:" && openssl x509 -in certs/tls.crt -noout -ext subjectAltName
+
+deploy-flyio: gen-certs-flyio create-redis-flyio
+	bash flyio/deploy.sh
+
+destroy-flyio:
+	@export FLYCTL_NO_UPDATE_CHECK=1 && export FLY_NO_UPDATE_CHECK=1 && \
+	. flyio/config.env && \
+	for svc in batch-cron nginx subscriber batch api web migration httpstan mysql; do \
+		echo "Destroying $${APP_PREFIX}-$${svc}..." && \
+		fly app destroy "$${APP_PREFIX}-$${svc}" --yes 2>/dev/null || true; \
+	done && \
+	REDIS_DB="$${APP_PREFIX}-redis" && \
+	if fly redis list 2>/dev/null | grep -q "$$REDIS_DB"; then \
+		echo "Destroying Upstash Redis $${REDIS_DB}..." && \
+		fly redis destroy "$$REDIS_DB" --yes 2>/dev/null || true; \
+	fi
+
+ip-flyio:
+	@. flyio/config.env && \
+	echo "==> Nginx (web console):" && fly ips list -a "$${APP_PREFIX}-nginx" && \
+	echo "" && echo "==> API (global, SDK endpoint):" && fly ips list -a "$${APP_PREFIX}-api"
+
+logs-flyio:
+	@. flyio/config.env && fly logs -a "$${APP_PREFIX}-web"
+
+# ── AWS ECS ───────────────────────────────────────────────────────────────────
+
 init-aws:
 	cd aws/modules && terraform init
 
