@@ -6,7 +6,7 @@ export FLY_NO_UPDATE_CHECK := 1
 # ── Fly.io (fly.toml based) ───────────────────────────────────────────────────
 
 create-redis-flyio:
-	@source flyio/config.env && \
+	@. flyio/config.env && \
 	REDIS_DB="$${APP_PREFIX}-redis" && \
 	if fly redis list 2>/dev/null | grep -q "$$REDIS_DB"; then \
 		echo "Upstash Redis '$$REDIS_DB' already exists"; \
@@ -29,7 +29,7 @@ deploy-flyio: gen-certs-flyio create-redis-flyio
 
 destroy-flyio:
 	@export FLYCTL_NO_UPDATE_CHECK=1 && export FLY_NO_UPDATE_CHECK=1 && \
-	source flyio/config.env && \
+	. flyio/config.env && \
 	for svc in batch-cron nginx subscriber batch api web migration httpstan mysql; do \
 		echo "Destroying $${APP_PREFIX}-$${svc}..." && \
 		fly app destroy "$${APP_PREFIX}-$${svc}" --yes 2>/dev/null || true; \
@@ -41,12 +41,12 @@ destroy-flyio:
 	fi
 
 ip-flyio:
-	@source flyio/config.env && \
+	@. flyio/config.env && \
 	echo "==> Nginx (web console):" && fly ips list -a "$${APP_PREFIX}-nginx" && \
 	echo "" && echo "==> API (global, SDK endpoint):" && fly ips list -a "$${APP_PREFIX}-api"
 
 logs-flyio:
-	@source flyio/config.env && fly logs -a "$${APP_PREFIX}-web"
+	@. flyio/config.env && fly logs -a "$${APP_PREFIX}-web"
 
 # ── AWS ECS ───────────────────────────────────────────────────────────────────
 

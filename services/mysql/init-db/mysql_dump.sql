@@ -7,7 +7,7 @@ CREATE DATABASE bucketeer;
 USE bucketeer;
 
 --
--- Alter Databse character and collate to support the dev container
+-- Alter Database character and collate to support the dev container
 --
 
 ALTER DATABASE bucketeer CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;

@@ -299,7 +299,7 @@ make destroy-aws
 
 ## Certs
 
-The `**certs/**` folder in this repo is **for example / local development only**. It typically contains:
+The `certs/` folder in this repo is **for example / local development only**. It typically contains:
 
 - `tls.crt`, `tls.key` — TLS for services and Nginx.
 - `service-token` — service-to-service auth token.
@@ -324,7 +324,7 @@ These files are copied into Docker images when you run `make push-aws`. For real
 | `gen-certs-flyio`    | Regenerate TLS cert with Fly.io `.internal` SANs.                        |
 | `create-redis-flyio` | Provision Upstash Redis (idempotent).                                    |
 | `destroy-flyio`      | Destroy all Fly apps and Upstash Redis.                                  |
-| `ip-flyio`           | Show public IPs for the Nginx app.                                       |
+| `ip-flyio`           | Show public IPs for the Nginx and API apps.                              |
 | `logs-flyio`         | Tail logs for the web service.                                           |
 
 

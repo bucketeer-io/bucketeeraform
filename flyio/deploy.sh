@@ -191,7 +191,8 @@ done
 # ── 6. Deploy MySQL and httpstan ──────────────────────────────────────────────
 log "Deploying mysql..."
 ensure_machines_running "${P}-mysql"
-fly deploy --config flyio/mysql/fly.toml --app "${P}-mysql" --ha=false
+fly deploy --config flyio/mysql/fly.toml --app "${P}-mysql" --ha=false \
+  --image "registry.fly.io/${P}-mysql:${BUCKETEER_VERSION}"
 
 log "Waiting for MySQL TCP port 3306 to be ready..."
 for i in $(seq 1 60); do
@@ -222,7 +223,8 @@ fly ssh console -a "${P}-mysql" -C "mysql -h localhost -uroot --skip-password -e
 
 log "Deploying httpstan..."
 ensure_machines_running "${P}-httpstan"
-fly deploy --config flyio/httpstan/fly.toml --app "${P}-httpstan" --ha=false
+fly deploy --config flyio/httpstan/fly.toml --app "${P}-httpstan" --ha=false \
+  --image "ghcr.io/bucketeer-io/bucketeer-httpstan:0.0.1"
 
 # ── 7. Run database migration (one-shot) ──────────────────────────────────────
 # Atlas needs to know which migrations have already been applied.  When the
@@ -254,13 +256,15 @@ fly machine run \
      -u "mysql://bucketeer:${MYSQL_PASSWORD}@${P}-mysql.internal:3306/bucketeer"
 
 # ── 8. Deploy application services ────────────────────────────────────────────
-log "Deploying web (HA – two instances to avoid gRPC self-dial deadlock)..."
+log "Deploying web..."
 ensure_machines_running "${P}-web"
-fly deploy --config flyio/web/fly.toml --app "${P}-web"
+fly deploy --config flyio/web/fly.toml --app "${P}-web" --ha=false \
+  --image "registry.fly.io/${P}-web:${BUCKETEER_VERSION}"
 
 log "Deploying api (global)..."
 ensure_machines_running "${P}-api"
-fly deploy --config flyio/api/fly.toml --app "${P}-api"
+fly deploy --config flyio/api/fly.toml --app "${P}-api" \
+  --image "registry.fly.io/${P}-api:${BUCKETEER_VERSION}"
 
 IFS=',' read -ra API_REGION_LIST <<< "${API_REGIONS:-${REGION}}"
 log "Scaling api to ${#API_REGION_LIST[@]} region(s): ${API_REGIONS:-${REGION}}"
@@ -272,20 +276,24 @@ fly scale count ${SCALE_ARGS} -a "${P}-api" --yes 2>/dev/null || true
 
 log "Deploying batch..."
 ensure_machines_running "${P}-batch"
-fly deploy --config flyio/batch/fly.toml --app "${P}-batch" --ha=false
+fly deploy --config flyio/batch/fly.toml --app "${P}-batch" --ha=false \
+  --image "registry.fly.io/${P}-batch:${BUCKETEER_VERSION}"
 
 log "Deploying subscriber..."
 ensure_machines_running "${P}-subscriber"
-fly deploy --config flyio/subscriber/fly.toml --app "${P}-subscriber" --ha=false
+fly deploy --config flyio/subscriber/fly.toml --app "${P}-subscriber" --ha=false \
+  --image "registry.fly.io/${P}-subscriber:${BUCKETEER_VERSION}"
 
 # ── 9. Deploy nginx and batch-cron ────────────────────────────────────────────
 log "Deploying nginx..."
 ensure_machines_running "${P}-nginx"
-fly deploy --config flyio/nginx/fly.toml --app "${P}-nginx" --ha=false
+fly deploy --config flyio/nginx/fly.toml --app "${P}-nginx" --ha=false \
+  --image "registry.fly.io/${P}-nginx:${BUCKETEER_VERSION}"
 
 log "Deploying batch-cron..."
 ensure_machines_running "${P}-batch-cron"
-fly deploy --config flyio/batch-cron/fly.toml --app "${P}-batch-cron" --ha=false
+fly deploy --config flyio/batch-cron/fly.toml --app "${P}-batch-cron" --ha=false \
+  --image "registry.fly.io/${P}-batch-cron:${BUCKETEER_VERSION}"
 
 # ── Done ──────────────────────────────────────────────────────────────────────
 echo ""
