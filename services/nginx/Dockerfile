@@ -1,4 +1,4 @@
-FROM nginx:1.25-alpine
+FROM nginx:1.31.9-alpine
 ARG NGINX_CONF=config/nginx/bucketeer-ecs.conf
 RUN apk add --no-cache gettext && rm -f /etc/nginx/conf.d/default.conf
 RUN mkdir -p /etc/nginx/certs
