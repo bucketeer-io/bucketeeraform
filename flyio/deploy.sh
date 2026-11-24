@@ -98,7 +98,9 @@ else
 fi
 
 # ── 4. Set secrets ────────────────────────────────────────────────────────────
-if [ ! -f "${CERTS}/tls.key" ] || [ ! -f "${CERTS}/oauth-private.pem" ] || [ ! -f "${CERTS}/service-token" ]; then
+if [ ! -f "${CERTS}/tls.key" ] || [ ! -f "${CERTS}/tls.crt" ] \
+  || [ ! -f "${CERTS}/oauth-private.pem" ] || [ ! -f "${CERTS}/oauth-public.pem" ] \
+  || [ ! -f "${CERTS}/service-token" ]; then
   log "Generating example certs..."
   bash certs/generate.sh "${CERTS}"
 fi

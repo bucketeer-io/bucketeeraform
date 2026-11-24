@@ -12,6 +12,26 @@ set -euo pipefail
 root="$(cd "$(dirname "$0")/.." && pwd)"
 dest="${1:-${root}/certs}"
 config="${root}/config/oauth-config.json"
+# Batch validates these exact values in flyio/batch/fly.toml and aws/modules/ecs.tf.
+# Reject anything else before writing files, so a custom issuer cannot produce a
+# token the services will refuse.
+python3 - "${config}" <<'PY'
+import json
+import sys
+
+with open(sys.argv[1], encoding="utf-8") as handle:
+    config = json.load(handle)
+issuer = config.get("issuer")
+audience = config.get("audience")
+email = (config.get("demoSignIn") or {}).get("email")
+if issuer != "https://localhost" or audience != "bucketeer":
+    sys.exit(
+        "config/oauth-config.json issuer and audience must stay "
+        "https://localhost and bucketeer; Batch rejects other values"
+    )
+if not email:
+    sys.exit("config/oauth-config.json demoSignIn.email must be set")
+PY
 # Write the whole set in a temp directory and publish it only after the token
 # verifies. A failed run must not leave a new key next to the previous token:
 # the deploy scripts skip generation when the key files already exist.
