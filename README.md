@@ -299,17 +299,13 @@ make destroy-aws
 
 ## Certs
 
-The `certs/` folder in this repo is **for example / local development only**. It typically contains:
+`make gen-certs-flyio` (or `bash certs/generate.sh`) writes the example material into `certs/` and does not commit it:
 
 - `tls.crt`, `tls.key` — TLS for services and Nginx.
-- `service-token` — service-to-service auth token.
+- `service-token` — service-to-service auth token, signed by the OAuth key from the same run.
 - `oauth-public.pem`, `oauth-private.pem` — OAuth keys for the web app.
 
-These files are copied into Docker images when you run `make push-aws`. For real environments you should:
-
-- **Not** commit real secrets or production certs.
-- Generate or obtain proper certificates and tokens and place them in `certs/` (or override via env at runtime where supported) before building images.
-- Keep `config.tfvars` and any secret files out of version control (e.g. via `.gitignore`).
+`make deploy-flyio` generates them before deploying. `make push-aws` generates them when they are missing, then copies them into the images. The service token is signed for the issuer, audience, and demo email in `config/oauth-config.json`, which is what the services check. Do not commit the generated files. `config.tfvars` stays out of version control as well.
 
 ---
 
@@ -321,7 +317,7 @@ These files are copied into Docker images when you run `make push-aws`. For real
 | Make target          | Purpose                                                                  |
 | -------------------- | ------------------------------------------------------------------------ |
 | `deploy-flyio`       | Full deploy: gen certs, create Redis, build images, deploy all services. |
-| `gen-certs-flyio`    | Regenerate TLS cert with Fly.io `.internal` SANs.                        |
+| `gen-certs-flyio`    | Regenerate the TLS cert, OAuth key, and service token.                   |
 | `create-redis-flyio` | Provision Upstash Redis (idempotent).                                    |
 | `destroy-flyio`      | Destroy all Fly apps and Upstash Redis.                                  |
 | `ip-flyio`           | Show public IPs for the Nginx and API apps.                              |
