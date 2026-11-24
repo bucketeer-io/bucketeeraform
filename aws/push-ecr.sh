@@ -9,6 +9,11 @@ cd "$REPO_ROOT"
 REGION="${AWS_REGION:-us-east-1}"
 BUCKETEER_VERSION="${BUCKETEER_VERSION:-v2.2.0}"
 
+if [ ! -f certs/tls.key ] || [ ! -f certs/oauth-private.pem ] || [ ! -f certs/service-token ]; then
+  echo "Generating example certs..."
+  bash certs/generate.sh
+fi
+
 echo "Building from services/ with config/ (BUCKETEER_VERSION=${BUCKETEER_VERSION})..."
 docker build --platform linux/amd64 --build-arg BUCKETEER_VERSION="${BUCKETEER_VERSION}" -f services/api/Dockerfile       -t bucketeer-api:latest       .
 docker build --platform linux/amd64 --build-arg BUCKETEER_VERSION="${BUCKETEER_VERSION}" -f services/web/Dockerfile       -t bucketeer-web:latest       .

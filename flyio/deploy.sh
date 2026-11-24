@@ -98,6 +98,10 @@ else
 fi
 
 # ── 4. Set secrets ────────────────────────────────────────────────────────────
+if [ ! -f "${CERTS}/tls.key" ] || [ ! -f "${CERTS}/oauth-private.pem" ] || [ ! -f "${CERTS}/service-token" ]; then
+  log "Generating example certs..."
+  OAUTH_ISSUER="${OAUTH_ISSUER:-https://localhost}" bash certs/generate.sh
+fi
 TLS_CERT=$(cat "${CERTS}/tls.crt")
 TLS_KEY=$(cat "${CERTS}/tls.key")
 SERVICE_TOKEN=$(cat "${CERTS}/service-token")

@@ -17,12 +17,7 @@ create-redis-flyio:
 	fi
 
 gen-certs-flyio:
-	@echo "Generating TLS cert with Fly.io .internal SANs..."
-	@openssl req -x509 -nodes -newkey rsa:2048 \
-		-keyout certs/tls.key -out certs/tls.crt \
-		-days 36500 -subj "/CN=*.bucketeer.io" \
-		-addext "subjectAltName=DNS:localhost,DNS:*.bucketeer.io,DNS:*.default.svc.cluster.local,DNS:*.bucketeer.local,DNS:nginx,DNS:web,DNS:api,DNS:batch,DNS:subscriber,DNS:mysql,DNS:redis,DNS:bucketeer-web.internal,DNS:bucketeer-nginx.internal,DNS:bucketeer-api.internal,DNS:bucketeer-batch.internal,DNS:bucketeer-subscriber.internal,DNS:bucketeer-mysql.internal"
-	@echo "Done. SANs:" && openssl x509 -in certs/tls.crt -noout -ext subjectAltName
+	bash certs/generate.sh
 
 deploy-flyio: gen-certs-flyio create-redis-flyio
 	bash flyio/deploy.sh
