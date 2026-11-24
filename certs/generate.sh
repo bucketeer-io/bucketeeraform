@@ -1,16 +1,18 @@
 #!/usr/bin/env bash
 # Generate the example TLS certificate, OAuth signing key, and service token.
-# The files are gitignored. Docker builds and deploys read them from certs/.
-# Do not commit the files this script writes.
+# The files are gitignored. Do not commit the files this script writes.
+#
+# Usage: certs/generate.sh [output-directory]
+# The default output directory is certs/ at the repository root. The token
+# issuer, audience, and email come from config/oauth-config.json, which is
+# what the services validate. Do not pass a different issuer on the command
+# line: the Fly and ECS configs check the values in that file.
 set -euo pipefail
 
 root="$(cd "$(dirname "$0")/.." && pwd)"
-certs="${root}/certs"
+certs="${1:-${root}/certs}"
+config="${root}/config/oauth-config.json"
 mkdir -p "${certs}"
-
-issuer="${OAUTH_ISSUER:-https://localhost}"
-audience="${OAUTH_AUDIENCE:-bucketeer}"
-email="${SERVICE_TOKEN_EMAIL:-demo@bucketeer.io}"
 
 echo "Generating TLS certificate..."
 openssl req -x509 -nodes -newkey rsa:2048 \
@@ -25,14 +27,21 @@ openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out "${certs}/oaut
 openssl pkey -in "${certs}/oauth-private.pem" -pubout -out "${certs}/oauth-public.pem"
 
 echo "Signing example service token..."
-python3 - "${certs}" "${issuer}" "${audience}" "${email}" <<'PY'
+python3 - "${certs}" "${config}" <<'PY'
 import base64
 import json
 import subprocess
 import sys
 from datetime import datetime, timedelta, timezone
 
-certs, issuer, audience, email = sys.argv[1:5]
+certs, config_path = sys.argv[1:3]
+with open(config_path, encoding="utf-8") as handle:
+    config = json.load(handle)
+issuer = config["issuer"]
+audience = config["audience"]
+email = config["demoSignIn"]["email"]
+if not issuer or not audience or not email:
+    sys.exit("config/oauth-config.json must set issuer, audience, and demoSignIn.email")
 now = datetime.now(timezone.utc)
 exp = now + timedelta(days=365 * 100)
 

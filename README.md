@@ -305,7 +305,7 @@ make destroy-aws
 - `service-token` — service-to-service auth token, signed by the OAuth key from the same run.
 - `oauth-public.pem`, `oauth-private.pem` — OAuth keys for the web app.
 
-`make deploy-flyio` generates them before deploying. `make push-aws` generates them when they are missing, then copies them into the images. For a real environment, generate your own keys and token (set `OAUTH_ISSUER` and `SERVICE_TOKEN_EMAIL`) or override the values at runtime. Do not commit them. `config.tfvars` stays out of version control as well.
+`make deploy-flyio` generates them before deploying. `make push-aws` generates them when they are missing, then copies them into the images. The service token is signed for the issuer, audience, and demo email in `config/oauth-config.json`, which is what the services check. Do not commit the generated files. `config.tfvars` stays out of version control as well.
 
 ---
 

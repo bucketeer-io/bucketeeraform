@@ -100,7 +100,17 @@ fi
 # ── 4. Set secrets ────────────────────────────────────────────────────────────
 if [ ! -f "${CERTS}/tls.key" ] || [ ! -f "${CERTS}/oauth-private.pem" ] || [ ! -f "${CERTS}/service-token" ]; then
   log "Generating example certs..."
-  OAUTH_ISSUER="${OAUTH_ISSUER:-https://localhost}" bash certs/generate.sh
+  bash certs/generate.sh "${CERTS}"
+fi
+# Dockerfiles copy the repository certs/ directory. When CERTS_DIR points
+# somewhere else, the image must still receive the same files the Fly secrets use.
+repo_certs="$(cd "$(dirname "$0")/.." && pwd)/certs"
+certs_abs="$(cd "${CERTS}" && pwd)"
+if [ "${certs_abs}" != "${repo_certs}" ]; then
+  mkdir -p "${repo_certs}"
+  cp "${CERTS}/tls.crt" "${CERTS}/tls.key" "${CERTS}/oauth-public.pem" \
+    "${CERTS}/oauth-private.pem" "${CERTS}/service-token" "${repo_certs}/"
+  chmod 600 "${repo_certs}/tls.key" "${repo_certs}/oauth-private.pem" "${repo_certs}/service-token"
 fi
 TLS_CERT=$(cat "${CERTS}/tls.crt")
 TLS_KEY=$(cat "${CERTS}/tls.key")
