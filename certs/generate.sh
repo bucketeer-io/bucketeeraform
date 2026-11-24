@@ -10,9 +10,14 @@
 set -euo pipefail
 
 root="$(cd "$(dirname "$0")/.." && pwd)"
-certs="${1:-${root}/certs}"
+dest="${1:-${root}/certs}"
 config="${root}/config/oauth-config.json"
-mkdir -p "${certs}"
+# Write the whole set in a temp directory and publish it only after the token
+# verifies. A failed run must not leave a new key next to the previous token:
+# the deploy scripts skip generation when the key files already exist.
+stage="$(mktemp -d)"
+trap 'rm -rf "${stage}"' EXIT
+certs="${stage}"
 
 echo "Generating TLS certificate..."
 openssl req -x509 -nodes -newkey rsa:2048 \
@@ -115,5 +120,10 @@ with tempfile.TemporaryDirectory() as directory:
 PY
 
 echo "Verified the service token with the new OAuth public key."
+mkdir -p "${dest}"
+cp "${stage}/tls.crt" "${stage}/tls.key" "${stage}/oauth-public.pem" \
+  "${stage}/oauth-private.pem" "${stage}/service-token" "${dest}/"
+chmod 600 "${dest}/tls.key" "${dest}/oauth-private.pem" "${dest}/service-token"
+chmod 644 "${dest}/tls.crt" "${dest}/oauth-public.pem"
 echo "Done. SANs:"
-openssl x509 -in "${certs}/tls.crt" -noout -ext subjectAltName
+openssl x509 -in "${dest}/tls.crt" -noout -ext subjectAltName

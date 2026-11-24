@@ -17,7 +17,17 @@ create-redis-flyio:
 	fi
 
 gen-certs-flyio:
-	bash certs/generate.sh
+	@set -e; \
+	dest="certs"; \
+	if [ -f flyio/config.env ]; then . flyio/config.env; dest="$${CERTS_DIR:-certs}"; fi; \
+	bash certs/generate.sh "$$dest"; \
+	mkdir -p certs; \
+	dest_abs="$$(cd "$$dest" && pwd)"; \
+	repo_abs="$$(cd certs && pwd)"; \
+	if [ "$$dest_abs" != "$$repo_abs" ]; then \
+		cp "$$dest/tls.crt" "$$dest/tls.key" "$$dest/oauth-public.pem" "$$dest/oauth-private.pem" "$$dest/service-token" certs/; \
+		chmod 600 certs/tls.key certs/oauth-private.pem certs/service-token; \
+	fi
 
 deploy-flyio: gen-certs-flyio create-redis-flyio
 	bash flyio/deploy.sh
